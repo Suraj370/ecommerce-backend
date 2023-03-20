@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken')
+const {StatusCodes} = require('http-status-codes')
+
 
 const createJWT = ({payload})=>{
   const token = jwt.sign({payload}, process.env.JWT_SECRET,{
@@ -8,22 +10,23 @@ const createJWT = ({payload})=>{
 }
 
 const verifyToken = (req, res, next) => {
-  const { headers: { authorization } } = req;
-  
-  if (!authorization) {
-    return res.status(401).json('You are not authenticated!');
-  }
-  
-  const token = authorization.split(' ')[1];
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, { payload }) => {
+  if (token == null) return res.status(StatusCodes.UNAUTHORIZED).json({success: false, message: 'UNAUTHORIZED'})
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+   
+
     if (err) {
-      return res.status(403).json('Token is not valid!');
-    }
+      return res.status(StatusCodes.FORBIDDEN).json({success: false, message: 'Token is invalid'})
+  }
 
-    req.user = payload;
-    next();
-  });
+    req.user = user.payload
+
+
+    next()
+  })
 };
 
   module.exports = {

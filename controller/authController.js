@@ -49,6 +49,13 @@ const signin = catchAsync(
 }
 ) 
 
+const signout = catchAsync((req, res) =>{
+  res.cookie('refresh_token', 'logout', {
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000),
+  });
+  res.status(StatusCodes.OK).json({ msg: 'user logged out!' });
+})
 
 
-module.exports = {signup, signin}
+module.exports = {signup, signin, signout}

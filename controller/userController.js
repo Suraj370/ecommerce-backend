@@ -1,9 +1,8 @@
 const User = require('../models/User')
-const customError = require('../errors')
 const {StatusCodes} = require('http-status-codes')
 const { catchAsync } = require('../utils')
 
-const profile = async(req, res, next) =>{
+const profile = catchAsync( async(req, res, next) =>{
     const userId = req.params.id
     const user = await User.findById(userId)
     
@@ -11,19 +10,39 @@ const profile = async(req, res, next) =>{
         success:true,
         message: `Hello, ${user.username}`
     })
-}
+})
 
 
-const getAllUser = catchAsync(async(req, res, next) =>{
-    const users = await User.findOne({})
+
+const getAllUser =catchAsync(async(req, res, next) =>{
+    const user = await User.find({})
+ 
+    
     res.status(StatusCodes.OK).json({
-        users
+        success:true,
+        user
     })
 })
+
+
+  const deleteUser = catchAsync (async(req, res, next) => {
+    const id = req.params.id
+    await User.findByIdAndDelete(id)
+    res.cookie('refresh_token', 'deleted user', {
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000),
+      });
+    res.status(StatusCodes.ACCEPTED).json({
+        success: true,
+        message: 'User deleted'
+    })
+
+  })
 
 
 
 module.exports = {
     profile,
-    getAllUser
+    getAllUser,
+    deleteUser,
 }

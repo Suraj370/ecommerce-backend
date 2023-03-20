@@ -5,7 +5,6 @@ const {verifyToken} = require('../utils')
 const verifyTokenAndAuthorization = (req, res, next) => {
   verifyToken(req, res, () => {
 
-
     if (req.user.id === req.params.id ) {
         next();
     } else {

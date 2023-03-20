@@ -6,6 +6,7 @@ const {signup, signin} = require('../controller')
 
 router.post('/signup', signup)
 router.post('/signin', signin)
+router.post('/signout')
 
 
 module.exports = router
